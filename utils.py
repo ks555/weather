@@ -9,7 +9,7 @@ import pytz
 
 def get_cprc_tts(text, language='english', gender='male',  accent=None, strict_gender=False, \
 				 strict_accent=False, sample_rate='8000', audio_format='wav', metadata=True):
-		file = "audio/pt_" + "_" + datetime.datetime.now().strftime("%Y%m%d%H%M") + ".wav"
+		file = "audio/"+ datetime.datetime.now().strftime("%Y%m%d%H%M") + ".wav"
 		# config = configparser.ConfigParser()
 		# config.read('config.ini')
 		# username = config['cerecloud']['CEREPROC_USERNAME']
@@ -79,25 +79,7 @@ def get_local_time(time_zone):
 	local_time = datetime.datetime.now(tz)
 	return(local_time, tz)
 
-# make station class
-def get_yr_URL(station):
 
-	if station == 'cu':
-		print("hi there")
-		url = 'https://www.yr.no/place/Portugal/Madeira/Curral_das_Freiras/forecast.xml'
-	elif station == 'ro':
-		url = 'https://www.yr.no/place/Romania/Tulcea/Sf%C3%A2ntu_Gheorghe/forecast.xml'
-	else: url = None
-	return url
-
-
-def getStationLanguage(station):
-	if station == "cu":
-		return "pt"
-	if station == "ro":
-		return "ro"
-	else:
-		return None
 
 
 # Convert time string of a specific formate to time object, return 

@@ -12,23 +12,37 @@ from bs4 import BeautifulSoup
 import pytz
 import csv
 
+
 class YrForecast:
 
-    def __init__(self, station, language, time_frame_count=2):
+    def __init__(self, station, language, gender="female", accent=None, strict_gender=False, \
+            strict_accent=False, sample_rate=8000, audio_format='wav', metadata=True, time_frame_count=2):
         self.station = station
         self.language = language
+        self.accent = accent
+        self.gender = gender
+        self.strict_gender = strict_gender
+        self.strict_accent = strict_accent
+        self.sample_rate = sample_rate
+        self.audio_format = audio_format
+        self.metadata = metadata
         self.time_frame_count = time_frame_count
+        self.generate_forecast_string()
 
-
-    def create_forecast_string(self):
-        url = utils.get_yr_URL(self.station)
+    def generate_forecast_string(self):
+        url = self.set_yr_URL()
         response = requests.get(url)
         html = response.content
         self.bs = BeautifulSoup(html, 'lxml')
-        self.get_current_weather()
+        self.request_current_weather()
 
 
-    def get_current_weather(self):
+    def generate_forecast_audio(self, forecast_string):
+        utils.get_cprc_tts(self.forecast_string, self.language, self.gender, self.accent, self.strict_gender, \
+            self.strict_accent, self.sample_rate, self.audio_format, self.metadata)
+
+
+    def request_current_weather(self):
         local_time, tz = utils.get_local_time(self.bs.timezone["id"])
         time_frames = self.bs.find_all("time")
         temperature = []
@@ -46,20 +60,10 @@ class YrForecast:
             percipitation.append(time_frames[i].precipitation['value'])
             weather.append(self.translate(time_frames[i].symbol['number'], "weather"))
 
-        self.get_forecast_string(i, forecast_time, temperature, wind_direction, wind_speed, percipitation, weather)
+        self.set_forecast_string(i, forecast_time, temperature, wind_direction, wind_speed, percipitation, weather)
 
 
-    def translate(self, id, table):
-        file_dict = {"weather":'weather_translation_yrno.csv', "direction":"direction_translation_yrno.csv"}
-        with open(file_dict[table], mode='r') as infile:
-            reader = csv.DictReader(infile, delimiter="\t")
-            for row in reader: 
-                if row['ID'] == str(id):
-                    print(row[self.language])
-                    return row[self.language]
-
-
-    def get_forecast_string(self, i, forecast_time, temperature, wind_direction, wind_speed, percipitation, weather):
+    def set_forecast_string(self, i, forecast_time, temperature, wind_direction, wind_speed, percipitation, weather):
         if self.language == "portuguese":
     		self.forecast_string = "Bom dia, são " + time + " este é o tempo para o Curral das Freiras nesta linda manhã " + date + " " + \
             todayDayPart + "," + todaySummary + " a temperatura atual é " + currentTemperture + " será sentido ao longo do dia uma temperatura máxima de " + high + ", e uma temperatura mínima de " + low +  " espero que continuem connosco. Tenha uma boa manhã."
@@ -81,18 +85,40 @@ class YrForecast:
             self.forecast_string = ""
 
 
-def main():
-    # parser = argparse.ArgumentParser(description='Generates wav file based on current forecast on tempo.pt')
-    # parser.add_argument('station', type=str, help='station location code (cu, ma)')
-    # parser.add_argument('accent', type=str, help='PT accent code (pt, br, md)')
-    # parser.add_argument('-g', '--gender', type=str, default="female", help='Preferred gender of speaker)')
-    # args = parser.parse_args()
-    forecast = YrForecast("cu", "romanian")
-    forecast_string = forecast.create_forecast_string()
-    print(forecast_string)
-    utils.get_cprc_tts(forecast.forecast_string, "romanian", "female", accent=None, strict_gender=False, \
-        strict_accent=False, sample_rate=8000, audio_format='wav', metadata=True)
-        
+    def translate(self, id, table):
+        file_dict = {"weather":'weather_translation_yrno.csv', "direction":"direction_translation_yrno.csv"}
+        with open(file_dict[table], mode='r') as infile:
+            reader = csv.DictReader(infile, delimiter="\t")
+            for row in reader: 
+                if row['ID'] == str(id):
+                    print(row[self.language])
+                    return row[self.language]
+
+
+    def set_yr_URL(self):
+
+        if self.station == 'cu':
+            url = 'https://www.yr.no/place/Portugal/Madeira/Curral_das_Freiras/forecast.xml'
+        elif self.station == 'ro':
+            url = 'https://www.yr.no/place/Romania/Tulcea/Sf%C3%A2ntu_Gheorghe/forecast.xml'
+        else: url = None
+        return url
+
 
 if __name__ == "__main__":
-    main()  
+    parser = argparse.ArgumentParser(description='Generates wav file based on current forecast on yr.no')
+    parser.add_argument('station', type=str, help='station location code (cu, ma)')
+    parser.add_argument('language', type=str, help='language')
+    parser.add_argument('-g', '--gender', type=str, default='female', help='Preferred gender of speaker)')
+    parser.add_argument('-a', '--accent', type=str, default=None, help='Preferred gender of speaker)')
+    parser.add_argument('-sg', '--strict_gender', default=False, type=str, help='is preferred gender strict?')
+    parser.add_argument('-sa', '--strict_accent', default=False, type=str, help='is preferred accent strict?')
+    parser.add_argument('-sr', '--sample_rate', default=8000, type=int, help='sample rate')
+    parser.add_argument('-af', '--audio_format', default='wav', type=str, help='is preferred accent strict?')
+    parser.add_argument('-m', '--metadata', default=False, type=str, help='metadata true or false')
+    parser.add_argument('-t', '--time_frame_count', default=2, type=int, help='number of time frames to forecast')
+
+    args = parser.parse_args()
+    forecast = YrForecast(args.station, args.language, args.gender, args.accent, args.strict_gender, \
+            args.strict_accent, args.sample_rate, args.audio_format, args.metadata, args.time_frame_count)
+    forecast.generate_forecast_audio(forecast.forecast_string)
