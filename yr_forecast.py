@@ -28,6 +28,8 @@ class YrForecast:
         self.metadata = metadata
         self.time_frame_count = time_frame_count
         self.generate_forecast_string()
+        self.generate_forecast_audio()
+
 
     def generate_forecast_string(self):
         url = self.set_yr_URL()
@@ -37,8 +39,8 @@ class YrForecast:
         self.request_current_weather()
 
 
-    def generate_forecast_audio(self, forecast_string):
-        utils.get_cprc_tts(self.forecast_string, self.language, self.gender, self.accent, self.strict_gender, \
+    def generate_forecast_audio(self):
+        self.forecast_audio = utils.get_cprc_tts(self.forecast_string, self.language, self.gender, self.accent, self.strict_gender, \
             self.strict_accent, self.sample_rate, self.audio_format, self.metadata)
 
 
@@ -64,12 +66,14 @@ class YrForecast:
 
 
     def set_forecast_string(self, i, forecast_time, temperature, wind_direction, wind_speed, percipitation, weather):
+        print(wind_speed[1], wind_direction[1])
         if self.language == "portuguese":
     		self.forecast_string = "Bom dia, são " + time + " este é o tempo para o Curral das Freiras nesta linda manhã " + date + " " + \
             todayDayPart + "," + todaySummary + " a temperatura atual é " + currentTemperture + " será sentido ao longo do dia uma temperatura máxima de " + high + ", e uma temperatura mínima de " + low +  " espero que continuem connosco. Tenha uma boa manhã."
         
         elif self.language == "romanian":
-             self.forecast_string = "Bună ziua Sfântu Gheorghe. Prognoza pentru ora " + forecast_time[0] + \
+            day_parts = [["dimineaţă","dupa amiaza","seară"],["buna dimineata","buna ziua","bună seara"]]   
+            self.forecast_string = "Sfântu Gheorghe. Prognoza pentru ora " + forecast_time[0] + \
                 " până la ora " + forecast_time[1] + " azi este astăzi înnorat, cu o temperatură de " + temperature[0] + \
                 " grade, cu vânt de " + wind_speed[0] + " metri pe secundă din direcția est. Prognoza de astăzi la ora " + \
                 forecast_time[2] + " până la ora " + forecast_time[3] + " PM este înnorat, cu o temperatură de " + temperature[1] + \
@@ -91,12 +95,10 @@ class YrForecast:
             reader = csv.DictReader(infile, delimiter="\t")
             for row in reader: 
                 if row['ID'] == str(id):
-                    print(row[self.language])
                     return row[self.language]
 
 
     def set_yr_URL(self):
-
         if self.station == 'cu':
             url = 'https://www.yr.no/place/Portugal/Madeira/Curral_das_Freiras/forecast.xml'
         elif self.station == 'ro':
@@ -121,4 +123,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     forecast = YrForecast(args.station, args.language, args.gender, args.accent, args.strict_gender, \
             args.strict_accent, args.sample_rate, args.audio_format, args.metadata, args.time_frame_count)
-    forecast.generate_forecast_audio(forecast.forecast_string)
