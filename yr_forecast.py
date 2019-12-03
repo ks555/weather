@@ -45,7 +45,8 @@ class YrForecast:
 
 
     def request_current_weather(self):
-        local_time, tz = utils.get_local_time(self.bs.timezone["id"])
+        self.tz = self.bs.timezone["id"]
+        self.day_part_idx = utils.day_part(self.tz)
         time_frames = self.bs.find_all("time")
         temperature = []
         wind_direction = []
@@ -66,18 +67,20 @@ class YrForecast:
 
 
     def set_forecast_string(self, i, forecast_time, temperature, wind_direction, wind_speed, percipitation, weather):
-        print(wind_speed[1], wind_direction[1])
         if self.language == "portuguese":
     		self.forecast_string = "Bom dia, são " + time + " este é o tempo para o Curral das Freiras nesta linda manhã " + date + " " + \
             todayDayPart + "," + todaySummary + " a temperatura atual é " + currentTemperture + " será sentido ao longo do dia uma temperatura máxima de " + high + ", e uma temperatura mínima de " + low +  " espero que continuem connosco. Tenha uma boa manhã."
         
         elif self.language == "romanian":
-            day_parts = [["dimineaţă","dupa amiaza","seară"],["buna dimineata","buna ziua","bună seara"]]   
-            self.forecast_string = "Sfântu Gheorghe. Prognoza pentru ora " + forecast_time[0] + \
+            day_parts = [["dimineaţă","dupa amiaza","seară"],["buna dimineata","buna ziua","bună seara"]]
+            next_part_idx = utils.next_index_loop(day_parts, self.day_part_idx)
+            self.forecast_string = day_parts[1][self.day_part_idx] + " Sfântu Gheorghe" + ". Prognoza " + \
+                day_parts[0][self.day_part_idx] + " pentru ora " + forecast_time[0] + \
                 " până la ora " + forecast_time[1] + " azi este astăzi înnorat, cu o temperatură de " + temperature[0] + \
-                " grade, cu vânt de " + wind_speed[0] + " metri pe secundă din direcția est. Prognoza de astăzi la ora " + \
-                forecast_time[2] + " până la ora " + forecast_time[3] + " PM este înnorat, cu o temperatură de " + temperature[1] + \
-                " grade, cu vânt de " + wind_speed[1] + "metri pe secundă din direcția " + wind_direction[1] + \
+                " grade, cu vânt de " + wind_speed[0] + " metri pe secundă din direcția est. Prognoza de astăzi " + \
+                day_parts[0][next_part_idx] + " la ora " + forecast_time[2] + " până la ora " + forecast_time[3] + \
+                " PM este înnorat, cu o temperatură de " + temperature[1] + " grade, cu vânt de " + wind_speed[1] + \
+                " metri pe secundă din direcția " + wind_direction[1] + \
                 ". Prognoza meteo din Yr, livrată de Institutul Meteorologic din Norvegia și NRK."
 
         elif self.language == "english":
