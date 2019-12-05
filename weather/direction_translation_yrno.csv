@@ -1,0 +1,17 @@
+ID	english	romanian	portuguese
+N	north	nord	
+E	east	est	
+S	south	sud	
+W	west	vest	
+NE	northeast	nord-est	
+NW	northwest	nord-vest	
+SE	southeast	sud-est	
+SW	southwest	sud-vest	
+NNE	north-northeast	nord-nord-est	
+NNW	north-northwest	nord-nord-vest	
+SSE	south-southeast	sud-sud-est	
+SSW	south-southwest	sud-sud-vest	
+WSW	west-soutwest	vest-sud-vest	
+ENE	east-northeast	est-nord-est	
+ESE	east-southeast	est-sud-est	
+WNW	west-northwest	est-nord-est	
