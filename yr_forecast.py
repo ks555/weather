@@ -70,24 +70,31 @@ class YrForecast:
         if self.language == "portuguese":
     		self.forecast_string = "Bom dia, são " + time + " este é o tempo para o Curral das Freiras nesta linda manhã " + date + " " + \
             todayDayPart + "," + todaySummary + " a temperatura atual é " + currentTemperture + " será sentido ao longo do dia uma temperatura máxima de " + high + ", e uma temperatura mínima de " + low +  " espero que continuem connosco. Tenha uma boa manhã."
-        
+            
+ 
         elif self.language == "romanian":
             day_parts = [["dimineaţă","dupa amiaza","seară"],["buna dimineata","buna ziua","bună seara"]]
             next_part_idx = utils.next_index_loop(day_parts, self.day_part_idx)
             self.forecast_string = day_parts[1][self.day_part_idx] + " Sfântu Gheorghe" + ". Prognoza " + \
                 day_parts[0][self.day_part_idx] + " pentru ora " + forecast_time[0] + \
-                " până la ora " + forecast_time[1] + " azi este astăzi înnorat, cu o temperatură de " + temperature[0] + \
+                " până la ora " + forecast_time[1] + " azi este astăzi " + weather[0] + ", cu o temperatură de " + temperature[0] + \
                 " grade, cu vânt de " + wind_speed[0] + " metri pe secundă din direcția est. Prognoza de astăzi " + \
                 day_parts[0][next_part_idx] + " la ora " + forecast_time[2] + " până la ora " + forecast_time[3] + \
-                " PM este înnorat, cu o temperatură de " + temperature[1] + " grade, cu vânt de " + wind_speed[1] + \
+                " este " + weather[1] + ", cu o temperatură de " + temperature[1] + " grade, cu vânt de " + wind_speed[1] + \
                 " metri pe secundă din direcția " + wind_direction[1] + \
                 ". Prognoza meteo din Yr, livrată de Institutul Meteorologic din Norvegia și NRK."
 
         elif self.language == "english":
-            self.forecast_string = "Hello, it is currently " + time + "in " + getStationLocation(station) + "." + "The forecast for " + timeFrame + \
-                "The forcast for " + timeframe + " is " + weather + " and " + temperature + " degrees, with wind of " + wind_speed + \
-                " meters per second, in the " + wind_direction + " direction."
-        
+            day_parts = [["morning","afternoon","evening"],["Good morning","Good afternoon","Good evening"]]
+            next_part_idx = utils.next_index_loop(day_parts, self.day_part_idx)
+            self.forecast_string = day_parts[1][self.day_part_idx] + " " + "location" + ". The forecast for this " + \
+                day_parts[0][self.day_part_idx] + " from " + forecast_time[0] + \
+                " to " + forecast_time[1] + " is " + weather[0] + ", with a temperature of " + temperature[0] + \
+                " degrees and a wind speed of " + wind_speed[0] + " meters per second from the " + wind_direction[0] + \
+                "direction. The forecast for this " + day_parts[0][next_part_idx] + " from " + forecast_time[2] + \
+                " to " + forecast_time[3] + " is " + weather[1] + " with a temperature of " + temperature[1] + \
+                " degrees and a wind speed of " + wind_speed[1] + " meters per second from the " + wind_direction[1] + \
+                " direction. Weather forecast from Yr, delivered by the Norwegian Meteorological Institute and NRK."
         else:
             self.forecast_string = ""
 
