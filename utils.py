@@ -80,6 +80,24 @@ def get_local_time(time_zone):
 	return(local_time, tz)
 
 
+def day_part(time_zone):
+	tz = pytz.timezone(time_zone)
+	local_time = datetime.datetime.now(tz)
+	if local_time.hour < 4:
+		return 2
+	elif local_time.hour < 12:
+	    return 0
+	elif 12 <= local_time.hour < 18:
+	    return 1
+	else:
+	    return 2
+
+def next_index_loop(items, idx):
+	if idx >= len(items):
+		return(0)
+	else:
+		return(idx+1)
+
 
 
 # Convert time string of a specific formate to time object, return 
