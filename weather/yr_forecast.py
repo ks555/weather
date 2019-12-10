@@ -1,16 +1,19 @@
 # -*- coding: UTF-8 -*
-
 import requests
 import argparse
 import datetime
-from cerecloud_rest import CereprocRestAgent
-import utils
+import utils.utils as utils
 import json
 from xml.etree import ElementTree as ET
 from lxml import etree, html
 from bs4 import BeautifulSoup
 import pytz
 import csv
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 
 
 class YrForecast:
@@ -32,8 +35,8 @@ class YrForecast:
 
 
     def generate_forecast_string(self):
-        url = self.set_yr_URL()
-        response = requests.get(url)
+        self.set_yr_URL()
+        response = requests.get(self.url)
         html = response.content
         self.bs = BeautifulSoup(html, 'lxml')
         self.request_current_weather()
@@ -100,8 +103,9 @@ class YrForecast:
 
 
     def translate(self, id, table):
+        # change translation tables to be in db
         file_dict = {"weather":'weather_translation_yrno.csv', "direction":"direction_translation_yrno.csv"}
-        with open(file_dict[table], mode='r') as infile:
+        with open(os.path.join(os.path.dirname(__file__), file_dict[table]), mode='r') as infile:
             reader = csv.DictReader(infile, delimiter="\t")
             for row in reader: 
                 if row['ID'] == str(id):
@@ -110,11 +114,14 @@ class YrForecast:
 
     def set_yr_URL(self):
         if self.station == 'cu':
-            url = 'https://www.yr.no/place/Portugal/Madeira/Curral_das_Freiras/forecast.xml'
+            self.url = 'https://www.yr.no/place/Portugal/Madeira/Curral_das_Freiras/forecast.xml'
         elif self.station == 'ro':
-            url = 'https://www.yr.no/place/Romania/Tulcea/Sf%C3%A2ntu_Gheorghe/forecast.xml'
-        else: url = None
-        return url
+            self.url = 'https://www.yr.no/place/Romania/Tulcea/Sf%C3%A2ntu_Gheorghe/forecast.xml'
+        else: self.url = None
+
+
+    def get_yr_URL(self):
+        return self.url
 
 
 if __name__ == "__main__":
@@ -130,6 +137,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--metadata', default=False, type=str, help='metadata true or false')
     parser.add_argument('-t', '--time_frame_count', default=2, type=int, help='number of time frames to forecast')
 
+
     args = parser.parse_args()
-    forecast = YrForecast(args.station, args.language, args.gender, args.accent, args.strict_gender, \
+    YrForecast(args.station, args.language, args.gender, args.accent, args.strict_gender, \
             args.strict_accent, args.sample_rate, args.audio_format, args.metadata, args.time_frame_count)
