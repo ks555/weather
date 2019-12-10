@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*
 import requests
 import datetime
-from cerecloud_rest import CereprocRestAgent
+from cereproc.cerecloud_rest import CereprocRestAgent
 from suds.client import Client
 import ConfigParser
 import pytz
@@ -9,13 +9,14 @@ import pytz
 
 def get_cprc_tts(text, language='english', gender='male',  accent=None, strict_gender=False, \
 				 strict_accent=False, sample_rate='8000', audio_format='wav', metadata=True):
-		file = "audio/"+ datetime.datetime.now().strftime("%Y%m%d%H%M") + ".wav"
+		file = "weather/audio/"+ datetime.datetime.now().strftime("%Y%m%d%H%M") + ".wav"
 		# config = configparser.ConfigParser()
 		# config.read('config.ini')
 		# username = config['cerecloud']['CEREPROC_USERNAME']
 		# password = config['cerecloud']['CEREPROC_PASSWORD']
 		username = "5aec2e36c429d"
 		password = "VkZmL42e5L"
+		print(file)
 		restAgent = CereprocRestAgent("https://cerevoice.com/rest/rest_1_1.php", username, password, gender, language)
 		voice = restAgent._choose_voice(language, gender, accent, strict_gender, strict_accent)
 		url, transcript = restAgent.get_cprc_tts(text, voice, sample_rate, audio_format, metadata)
