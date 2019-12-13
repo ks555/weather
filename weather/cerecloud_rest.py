@@ -62,9 +62,8 @@ class CereprocRestAgent:
         elif audio_format not in ['wav', 'mp3',
                                   'ogg']:  # a format was specified but is not among those that are supported
             raise ValueError("Audio format not supported")
-        # print(metadata)
         metadata = bool(metadata)
-        # print(metadata)
+
         requestxml = self.__generate_request_xml("speakExtended", {'accountID': self._cereproc_username,
                                                                   'password': self._cereproc_password, 'voice': voice,
                                                                   'audioFormat': audio_format,
@@ -73,7 +72,6 @@ class CereprocRestAgent:
 
         
         requestxml = HTMLParser.HTMLParser().unescape(requestxml.decode('utf-8')).encode('utf-8')
-        print(requestxml)
         responsexml = self.__do_cprc_request(requestxml)
 
         if responsexml.findtext('resultCode') != '1':
@@ -82,6 +80,7 @@ class CereprocRestAgent:
 		
         audiofile_url = responsexml.findtext('fileUrl')
         metadata_url = responsexml.findtext('metadataUrl')
+        
         transcription = None
         if metadata_url is not None:
             transcription = {'trans': []}

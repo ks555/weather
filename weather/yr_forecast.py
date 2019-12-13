@@ -50,6 +50,7 @@ class YrForecast:
     def request_current_weather(self):
         self.tz = self.bs.timezone["id"]
         self.day_part_idx = utils.day_part(self.tz)
+        self.set_last_update(self.bs.find("lastupdate"))
         time_frames = self.bs.find_all("time")
         temperature = []
         wind_direction = []
@@ -112,11 +113,17 @@ class YrForecast:
                     return row[self.language]
 
 
+    def set_last_update(self, last_update_tag):
+        self.last_update = utils.get_time(last_update_tag.text)
+
+
     def set_yr_URL(self):
         if self.station == 'cu':
             self.url = 'https://www.yr.no/place/Portugal/Madeira/Curral_das_Freiras/forecast.xml'
-        elif self.station == 'ro':
+        elif self.station == 'sg':
             self.url = 'https://www.yr.no/place/Romania/Tulcea/Sf%C3%A2ntu_Gheorghe/forecast.xml'
+        elif self.station == 'vv':
+            self.url = 'https://www.yr.no/place/Romania/Other/V%C3%A2rvoru/forecast.xml'
         else: self.url = None
 
 

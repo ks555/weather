@@ -7,9 +7,9 @@ import ConfigParser
 import pytz
 
 
-def get_cprc_tts(text, language='english', gender='male',  accent=None, strict_gender=False, \
+def get_cprc_tts(text, language='english', gender='female',  accent=None, strict_gender=False, \
 				 strict_accent=False, sample_rate='8000', audio_format='wav', metadata=True):
-		file = "weather/audio/"+ datetime.datetime.now().strftime("%Y%m%d%H%M") + ".wav"
+		file = "weather/audio/"+ datetime.datetime.now().strftime("%Y%m%d%H%M")
 		# config = configparser.ConfigParser()
 		# config.read('config.ini')
 		# username = config['cerecloud']['CEREPROC_USERNAME']
@@ -21,8 +21,10 @@ def get_cprc_tts(text, language='english', gender='male',  accent=None, strict_g
 		voice = restAgent._choose_voice(language, gender, accent, strict_gender, strict_accent)
 		url, transcript = restAgent.get_cprc_tts(text, voice, sample_rate, audio_format, metadata)
 		r = requests.get(url)
-		with open(file, 'wb') as f:
+		with open(file + ".wav", 'wb') as f:
 				f.write(r.content)
+		with open(file + ".txt", 'wb') as f:
+				f.write(text)
 
 
 def get_cprc_tts_soap():
